@@ -1,0 +1,74 @@
+{
+  "images": [
+    {
+      "filename": "WIcon-48.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "48x48"
+    },
+    {
+      "filename": "WIcon-55.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "55x55"
+    },
+    {
+      "filename": "WIcon-58.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "58x58"
+    },
+    {
+      "filename": "WIcon-80.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "80x80"
+    },
+    {
+      "filename": "WIcon-87.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "87x87"
+    },
+    {
+      "filename": "WIcon-88.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "88x88"
+    },
+    {
+      "filename": "WIcon-100.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "100x100"
+    },
+    {
+      "filename": "WIcon-172.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "172x172"
+    },
+    {
+      "filename": "WIcon-196.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "196x196"
+    },
+    {
+      "filename": "WIcon-216.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "216x216"
+    },
+    {
+      "filename": "WIcon-1024.png",
+      "idiom": "watch",
+      "scale": "2x",
+      "size": "1024x1024"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

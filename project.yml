@@ -1,0 +1,122 @@
+name: AgentWatch
+options:
+  bundleIdPrefix: com.agentwatch
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  xcodeVersion: "15"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+    ENABLE_BITCODE: NO
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: ""
+
+# ─── Shared sources ──────────────────────────────────────────────────────────
+
+packages: {}
+
+# ─── Targets ─────────────────────────────────────────────────────────────────
+
+targets:
+
+  # ── iOS companion app ──────────────────────────────────────────────────────
+  AgentWatch:
+    type: application
+    platform: iOS
+    bundleId: com.agentwatch.app
+    info:
+      path: iOSApp/Info.plist
+      properties:
+        CFBundleDisplayName: AgentWatch
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        NSFaceIDUsageDescription: "AgentWatch uses Face ID to protect your relay credentials."
+        NSMicrophoneUsageDescription: "AgentWatch uses the microphone for voice input in chat."
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true   # for http LAN relay during dev
+        WKCompanionAppBundleIdentifier: com.agentwatch.app.watchkitapp
+    entitlements:
+      path: iOSApp/AgentWatch.entitlements
+    sources:
+      - path: iOSApp
+        excludes:
+          - "*.entitlements"
+          - "*.plist"
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentwatch.app
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
+
+  # ── watchOS app ────────────────────────────────────────────────────────────
+  AgentWatchWatch:
+    type: application
+    platform: watchOS
+    bundleId: com.agentwatch.app.watchkitapp
+    info:
+      path: WatchApp/Info.plist
+      properties:
+        CFBundleDisplayName: AgentWatch
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.agentwatch.app
+        NSMicrophoneUsageDescription: "AgentWatch uses the microphone for voice input."
+    entitlements:
+      path: WatchApp/AgentWatchWatch.entitlements
+    sources:
+      - path: WatchApp
+        excludes:
+          - "*.entitlements"
+          - "*.plist"
+      - path: Shared
+        excludes:
+          # Keychain API not available on watchOS; ConnectionStore uses #if os(watchOS) instead
+          - "Keychain.swift"
+    dependencies:
+      - target: AgentWatchWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentwatch.app.watchkitapp
+        TARGETED_DEVICE_FAMILY: "4"
+
+  # ── Watch widget / complication ────────────────────────────────────────────
+  AgentWatchWidget:
+    type: app-extension
+    platform: watchOS
+    bundleId: com.agentwatch.app.watchkitapp.widget
+    info:
+      path: Complication/Info.plist
+      properties:
+        CFBundleDisplayName: AgentWatch Widget
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Complication/AgentWatchWidget.entitlements
+    sources:
+      - path: Complication
+        excludes:
+          - "*.entitlements"
+          - "*.plist"
+      - path: Shared
+        # Widget only needs SharedDefaults and Models
+        includes:
+          - "SharedDefaults.swift"
+          - "Models.swift"
+          - "Theme.swift"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentwatch.app.watchkitapp.widget
+        TARGETED_DEVICE_FAMILY: "4"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES

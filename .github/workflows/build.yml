@@ -1,0 +1,88 @@
+name: Build unsigned IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Toolchain ────────────────────────────────────────────────────────
+      - name: Select Xcode 16
+        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Ensure watchOS SDK present
+        run: |
+          xcodebuild -showsdks | grep -i watchos || true
+          # Download simulator runtime if the full watchOS SDK is missing
+          xcodebuild -downloadPlatform watchOS || true
+
+      # ── Generate Xcode project ───────────────────────────────────────────
+      - name: Generate project
+        run: xcodegen generate --spec project.yml
+
+      # ── Build (unsigned) ─────────────────────────────────────────────────
+      - name: Build iOS app (unsigned)
+        run: |
+          xcodebuild \
+            -project AgentWatch.xcodeproj \
+            -scheme AgentWatch \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            ONLY_ACTIVE_ARCH=NO \
+            BUILD_DIR="$(pwd)/build" \
+            build 2>&1 | tee build.log | xcpretty --simple || {
+              echo "--- LAST 100 LINES OF BUILD LOG ---"
+              tail -100 build.log
+              exit 1
+            }
+
+      # ── Package IPA ──────────────────────────────────────────────────────
+      - name: Package IPA
+        run: |
+          APP=$(find build -name "AgentWatch.app" -not -path "*/watchsimulator*" | head -1)
+          echo "Found app: $APP"
+          mkdir -p Payload
+          cp -r "$APP" Payload/AgentWatch.app
+
+          # Ad-hoc codesign with entitlements (best-effort; non-fatal for sideloading)
+          WATCH_APP=$(find Payload/AgentWatch.app -name "*.app" -path "*/Watch/*" | head -1)
+          WIDGET_EXT=$(find Payload/AgentWatch.app -name "*.appex" | head -1)
+          for target in "$WATCH_APP" "$WIDGET_EXT" "Payload/AgentWatch.app"; do
+            if [ -n "$target" ] && [ -d "$target" ]; then
+              codesign --force --sign - "$target" 2>/dev/null || true
+            fi
+          done
+
+          zip -r AgentWatch.ipa Payload
+          echo "IPA size: $(du -sh AgentWatch.ipa | cut -f1)"
+          rm -rf Payload
+
+      # ── Upload artifacts ─────────────────────────────────────────────────
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgentWatch-${{ github.run_number }}
+          path: AgentWatch.ipa
+          retention-days: 30
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ github.run_number }}
+          path: build.log
+          retention-days: 7

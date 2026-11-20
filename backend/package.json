@@ -1,0 +1,22 @@
+{
+  "name": "agentwatch-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Relay for the AgentWatch Apple Watch app: approvals webhook, Claude/OpenAI streaming, push.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "mock": "node dist/mockAgent.js",
+    "pair": "node dist/pair.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

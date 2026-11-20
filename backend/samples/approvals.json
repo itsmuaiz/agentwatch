@@ -1,0 +1,37 @@
+[
+  {
+    "action_type": "send_email",
+    "title": "Send email to Sam",
+    "risk": "low",
+    "details": { "To": "sam@example.com", "Subject": "Notes from today's meeting", "Attachments": "none" },
+    "reasoning": "You asked me to send Sam a summary of today's meeting. I drafted three bullet points."
+  },
+  {
+    "action_type": "run_command",
+    "title": "Run build and deploy",
+    "risk": "medium",
+    "details": { "Command": "npm run build && npm run deploy", "Directory": "~/projects/site", "Host": "my-laptop" },
+    "reasoning": "Deploying is the last step of the task. The command only touches the site folder."
+  },
+  {
+    "action_type": "purchase",
+    "title": "Buy USB-C cable",
+    "risk": "high",
+    "details": { "Merchant": "Example Store", "Amount": "$24.99", "Card ending": "4242" },
+    "reasoning": "You asked me to order a replacement cable. This is the cheapest 2 m option in stock."
+  },
+  {
+    "action_type": "code_push",
+    "title": "Push 3 commits to main",
+    "risk": "high",
+    "details": { "Repository": "example/site", "Branch": "main", "Commits": "3" },
+    "reasoning": "Tests pass locally and you asked me to ship the fix."
+  },
+  {
+    "action_type": "other",
+    "title": "Delete 12 old log files",
+    "risk": "medium",
+    "details": { "Path": "/var/log/app", "Older than": "30 days", "Files": "12" },
+    "reasoning": "The disk is 91% full. These logs are older than your retention window."
+  }
+]
