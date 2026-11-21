@@ -50,6 +50,7 @@ struct PendingCountView: View {
                 }
                 .foregroundColor(entry.pendingCount > 0 ? .yellow : .white)
             }
+        #if os(watchOS)
         case .accessoryCorner:
             ZStack {
                 AccessoryWidgetBackground()
@@ -57,6 +58,7 @@ struct PendingCountView: View {
                     .font(.body.bold().monospacedDigit())
                     .widgetLabel("Approvals")
             }
+        #endif
         case .accessoryRectangular:
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.shield.fill")
@@ -88,7 +90,13 @@ struct AgentWatchWidget: Widget {
         }
         .configurationDisplayName("Approvals")
         .description("Shows pending agent approval requests.")
-        .supportedFamilies([.accessoryCircular, .accessoryCorner, .accessoryRectangular])
+        .supportedFamilies([
+            .accessoryCircular,
+            .accessoryRectangular,
+            #if os(watchOS)
+            .accessoryCorner,
+            #endif
+        ])
     }
 }
 
