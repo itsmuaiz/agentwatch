@@ -33,7 +33,7 @@ jobs:
         run: xcodegen generate --spec project.yml
 
       # ── Build (unsigned) ─────────────────────────────────────────────────
-      - name: Build iOS app (unsigned)
+      - name: Build iOS + watchOS app (unsigned)
         run: |
           set -o pipefail
           xcodebuild \
@@ -46,20 +46,24 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             ONLY_ACTIVE_ARCH=NO \
-            CONFIGURATION_BUILD_DIR="$(pwd)/build/Release-iphoneos" \
             build 2>&1 | tee build.log | xcpretty --simple || {
               echo "--- LAST 100 LINES OF BUILD LOG ---"
               tail -100 build.log
               exit 1
             }
 
+      - name: Show build products
+        run: find ~/Library/Developer/Xcode/DerivedData -name "AgentWatch.app" 2>/dev/null | head -10 || true
+
       # ── Package IPA ──────────────────────────────────────────────────────
       - name: Package IPA
         run: |
-          # Search both common output locations
-          APP=$(find build -name "AgentWatch.app" \
+          # Find the iOS app in DerivedData (xcodebuild default location)
+          APP=$(find ~/Library/Developer/Xcode/DerivedData -name "AgentWatch.app" \
             -not -path "*/watchsimulator*" \
-            -not -path "*.dSYM*" | head -1)
+            -not -path "*/watchos*" \
+            -not -path "*.dSYM*" \
+            -path "*/Release-iphoneos/*" | head -1)
           echo "Found app: $APP"
           mkdir -p Payload
           cp -r "$APP" Payload/AgentWatch.app

@@ -49,6 +49,9 @@ targets:
           - "*.entitlements"
           - "*.plist"
       - path: Shared
+    dependencies:
+      - target: AgentWatchWatch
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.agentwatch.app
