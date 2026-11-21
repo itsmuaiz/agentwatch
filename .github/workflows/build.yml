@@ -22,10 +22,11 @@ jobs:
           brew install xcodegen
           gem install xcpretty --no-document
 
-      - name: Ensure watchOS SDK present
+      - name: Show available SDKs and download iOS platform
         run: |
-          xcodebuild -showsdks | grep -i watchos || true
-          # Download simulator runtime if the full watchOS SDK is missing
+          xcodebuild -showsdks
+          # Download iOS platform if not present (Xcode 16 on macos-15 may need this)
+          xcodebuild -downloadPlatform iOS || true
           xcodebuild -downloadPlatform watchOS || true
 
       # ── Generate Xcode project ───────────────────────────────────────────
